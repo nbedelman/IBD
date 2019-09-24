@@ -1,0 +1,77 @@
+// set up a simple neutral simulation
+// template script for looking into the effect of varying (a) pop size, (b) fine-scale recomb, (c) number of chroms
+
+initialize() {
+	//defineConstant("L", 4000);
+	//defineConstant("s", 0.4);
+	//defineConstant("N", 10000);
+	//defineConstant("hyb_frac", 0.4);	// fraction of hybrids initially
+	//defineConstant("numChroms",10);
+	defineConstant("hybs", asInteger(round(hyb_frac*N)));
+	initializeMutationRate(0);
+	initializeMutationType("m1", 0.5, "f", 0);
+	m1.convertToSubstitution = F;
+	initializeGenomicElementType("g1", m1, 1);
+	initializeGenomicElement(g1, 0, L-1);
+
+	chroms=1:numChroms;
+	y=L/sum(chroms);
+	defineConstant("chromSizes",round(chroms*y));
+	defineConstant("chromRates",1/chromSizes);
+
+	allRates=NULL;
+	for (r in chromRates)
+		allRates=c(allRates,r,0.5);
+
+	ends=NULL;
+	current=0;
+	for (chromBreak in chromSizes){
+		ends=c(ends,asInteger(current+chromBreak-1),asInteger(current+chromBreak));
+		current=current+chromBreak;}
+	initializeRecombinationRate(allRates, ends);
+
+	//write table with genome information
+	position=0:L-1;
+	fullRecRate=NULL;
+	allChromNames=NULL;
+	allChromSizes=NULL;
+	for (chr in seq(0,length(chromSizes)-1)) {
+		fullRecRate=c(fullRecRate,rep(chromRates[chr],asInteger(chromSizes[chr])-1),0.5);
+		allChromNames=c(allChromNames,rep(chr+1,asInteger(chromSizes[chr])));
+		allChromSizes=c(allChromSizes,rep(chromSizes[chr],asInteger(chromSizes[chr])));}
+	writeGenome=NULL;
+	for (e in seq(0,L-1)){
+		writeGenome =c(writeGenome, position[e]+"\t"+fullRecRate[e]+"\t"+allChromNames[e]+"\t"+allChromSizes[e]);}
+	writeFile(filePath="genomeInfo.out",contents=writeGenome);
+
+}
+
+1 {
+	sim.addSubpop("p1", N);
+}
+
+fitness(NULL) {
+	introgressed = sum(c(genome1,genome2).countOfMutationsOfType(m1));
+	return 1.0 - (introgressed/(2*L))*s;
+}
+
+1 late() {
+	catn(hybs);
+	allIndividuals = p1.individuals;
+	sampledIndividuals = sample(p1.individuals, hybs);
+	sampledIndividuals.genome1.addNewMutation(m1, 0, seq(0,L-1));
+}
+
+1: late(){
+if (sim.generation % 5 != 0)
+return;
+
+	freqs=sim.mutationFrequencies(p1,sim.mutationsOfType(m1));
+	positions=sim.mutationsOfType(m1).position;
+	writeString=NULL;
+	for (element in seq(0,length(freqs)-1)){
+		writeString =c(writeString, positions[element]+"\t"+freqs[element]+"\t"+sim.generation);}
+	writeFile(filePath="frequencies.out",contents=writeString, append=T);
+}
+
+100 { sim.simulationFinished(); }
