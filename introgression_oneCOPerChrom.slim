@@ -1,0 +1,56 @@
+// set up a simple neutral simulation
+// template script for looking into the effect of varying (a) pop size, (b) fine-scale recomb, (c) number of chroms
+initialize() {
+	//defineConstant("L", 1000);
+	//defineConstant("s", 0.4);
+	//defineConstant("N", 100000);
+	//defineConstant("hyb_frac", 0.2);	// fraction of hybrids initially
+  //defineConstant("numChroms",20);
+  //defineConstant("baseRate",1e-8);
+  //defineConstant("baseGenSize",3e9);
+  defineConstant("effRate",(baseGenSize/L) * baseRate);
+	defineConstant("hybs", asInteger(round(hyb_frac*N)));
+	initializeMutationRate(0);
+  initializeMutationType("m1", 0.5, "f", 0);
+  m1.convertToSubstitution = F;
+  initializeGenomicElementType("g1", m1, 1.0);
+	initializeGenomicElement(g1, 0, L-1);
+  rates = c(rep(c(effRate,0.5),numChroms));
+  ends=NULL;
+  for (chromBreak in 1:numChroms)
+    ends=c(ends,asInteger(chromBreak*L/numChroms-1),asInteger(chromBreak*L/numChroms));
+  initializeRecombinationRate(rates, ends);
+	//initializeSex("A");
+
+}
+
+1 {
+	sim.addSubpop("p1", N);
+}
+
+fitness(NULL) {
+ introgressed = sum(c(genome1,genome2).countOfMutationsOfType(m1));
+return 1.0 - (introgressed/(2*L))*s;
+}
+
+1 late() {
+	catn(hybs);
+   allIndividuals = p1.individuals;
+	//sampledIndividuals = allIndividuals[0:hybs-1];
+	sampledIndividuals = sample(p1.individuals, hybs);
+   sampledIndividuals.genome1.addNewMutation(m1, 0, 1:L-1);
+	}
+
+1: late() {
+   inds = p1.individuals;
+   inds_introgressed = inds.countOfMutationsOfType(m1);
+   catn(mean(inds_introgressed)/(2*L));
+   }
+
+
+200 { sim.simulationFinished(); }
+
+// output samples of 10 genomes periodically, all fixed mutations at end
+//1000 late() { p1.outputSample(10); }
+//2000 late() { p1.outputSample(10); }
+//2000 late() { sim.outputFixedMutations(); }
