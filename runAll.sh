@@ -11,19 +11,20 @@ export R_LIBS_USER=$HOME/apps/R:$R_LIBS_USER
 ######## SEX DIFFERENCE #########
 ### define constant variables ###
 BASEDIR=$PWD
-slimTemplate=$BASEDIR/code/introgression_Human_sexdiff.template.slim
-workDir=$BASEDIR/sexDiff_multiParTrial
+slimTemplate=$BASEDIR/code/introgression_constRecRate.slim
+workDir=$BASEDIR/constantRecMap_ratePopChrom
 numReps=10
-outBase=sexDiff_multiParTrial
+outBase=constantRecMap_ratePopChrom
+
+L=1000 #Length (number of loci.
+s=0.4
+baseGenSize=1e9
+hyb_frac=0.1
 
 ## define changing variables ###
-L=$(echo 1000) #Length (number of loci. Would need new recombination maps to change this)
-N=$(echo 100000)
-s=$(echo 0.4)
-hyb_frac=$(echo 0.1 0.2 0.4)
-MR=("'$BASEDIR/data/linkage_data_male.human.txt'" "'$BASEDIR/data/linkage_data_male.fly.txt'")
-FR=("'$BASEDIR/data/linkage_data_female.human.txt'" "'$BASEDIR/data/linkage_data_female.fly.txt'")
-rLabel=('Human' 'Fly')
+baseRate=$(echo 1e-7 1e-8 1e-9 1e-10)
+N=$(echo 1000 10000 100000 1000000)
+numChroms=$(echo 1 5 10 20 30 100 1000)
 
 ### run code ###
 mkdir -p $workDir
@@ -31,15 +32,13 @@ mkdir -p $workDir
 cd $workDir
 
 #run SLIM for specified parameters
-for length in $L
+for rate in $baseRate
   do for num in $N
-    do for sel in $s
-      do for frac in $hyb_frac
-        do for rec in 0 1
-          do for gens in $numGens
-            do varString=$(echo "-d" L=$length "-d" N=$num "-d" s=$sel "-d" hyb_frac=$frac "-d" MR=$(printf '%s' ${MR[rec]}) "-d" FR=$(printf '%s' ${FR[rec]}) "-d" numGens=$gens)
+    do for chr in $numChroms
+            do varString=$(echo "-d" L=$L "-d" s=$s "-d" baseGenSize=$baseGenSize "-d" hyb_frac=$hyb_frac \
+            "-d" baseRate=$rate "-d" N=$num "-d" numChroms=$chr)
               echo $varString
-              varName=h$frac.sp${rLabel[rec]}
+              varName=$rate\_$num\_$chr
               echo $varName >> variableNames.txt
               mkdir $varName
               cd $varName

@@ -1,0 +1,49 @@
+#!/bin/bash
+
+##test the expectation of hill-roberston interference
+##expectation: populations are less efficient at removing deleterious alleles when 4Nr < 1
+##keep mutation map (number of chromosomes and fine-scale recomb rate) constant, but change population size
+##symmetric, 2 orders of magnitude around 4Nr=1
+
+#### setup environment
+#module load centos6/0.0.1-fasrc01 R/3.4.1-fasrc01
+#export R_LIBS_USER=$HOME/apps/R:$R_LIBS_USER
+
+######## SEX DIFFERENCE #########
+### define constant variables ###
+BASEDIR=$PWD
+slimTemplate=$BASEDIR/code/blockLengthDistribution.slim
+workDir=$BASEDIR/blockLengthDistribution_rate1e3_allHyb
+numReps=100
+outBase=randomRecRate
+
+L=1000  #Length (number of loci.
+s=0.4
+hyb_frac=1.0 #0.4
+N=100000
+numChroms=1
+counter=1
+recRate=1e-3 #1e-5
+### run code ###
+mkdir -p $workDir
+
+cd $workDir
+
+#run SLIM for specified parameters
+startRep=3
+let endRep="$startRep + $counter"
+while [ $endRep -le $numReps ]
+do
+    varString=$(echo "-d" L=$L "-d" s=$s "-d" hyb_frac=$hyb_frac \
+     "-d" N=$N "-d" numChroms=$numChroms "-d" recRate=$recRate)
+      echo $varString
+      echo $startRep $endRep $counter
+      sbatch $BASEDIR/code/runSLIM.blockLength.slurm $slimTemplate "$varString" $startRep $endRep
+      let startRep="$endRep + 1"
+      let endRep="$startRep + $counter"
+done
+
+#compile results
+#run this separately, after previous code is done
+# cd $workDir
+# sbatch ../code/compileBlockLengths.slurm

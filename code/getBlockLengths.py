@@ -4,6 +4,7 @@ import sys
 
 inFile=sys.argv[1]
 outFile=sys.argv[2]
+repNum=int(sys.argv[3])
 
 def getBlockLengths(listOfPositions):
     blocks=[]
@@ -24,7 +25,7 @@ def getBlockLengths(listOfPositions):
         blocks.append(counter)
     return(blocks)
 
-def getBlockDistribution(inFile,outFile):
+def getBlockDistribution(inFile,outFile, repNum):
     blockFile=open(inFile,"r")
     blockDict={}
     for line in blockFile:
@@ -39,8 +40,8 @@ def getBlockDistribution(inFile,outFile):
     o=open(outFile,"w")
     for k in blockDict.keys():
         for length in blockDict[k]:
-            o.write('''%i\t%i\n''' % (k,length))
+            o.write('''%i\t%i\t%i\n''' % (repNum,k,length))
     blockFile.close()
     o.close()
 
-getBlockDistribution(inFile,outFile)
+getBlockDistribution(inFile,outFile,repNum)

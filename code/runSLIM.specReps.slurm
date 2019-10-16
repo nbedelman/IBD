@@ -6,7 +6,7 @@
 #SBATCH --mem=10000
 #SBATCH -t 0-02:00
 #SBATCH -e runSlim.err
-#SBATCH -o runSlum.out
+#SBATCH -o runSlim.out
 
 slimCode=$1
 varString=$2

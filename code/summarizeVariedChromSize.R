@@ -73,15 +73,15 @@ allRunsTable[,chroms:=factor(chroms,levels=c(1,5,10,50,100))]
 
 write.csv(file=paste0("hillRobertson",".2Kgens.allRunsTable.csv") , x=allRunsTable, quote=F, row.names=F)
 
-
+allRunsTable <- fread("hillRobertson.2Kgens.allRunsTable.csv")
 #### generate slope table #####
 allSlopes <- sapply(unique(allRunsTable$Group.3), FUN=function(gen){
-  oneModel <- lm(generationMean/Group.1 ~ Group.1, data=subset(allRunsTable, Group.3==gen & popSize==25000))
+  oneModel <- lm(log(generationMean/Group.1) ~ Group.1, data=subset(allRunsTable, Group.3==gen & popSize==25000))
   oneSlope <- oneModel$coefficients[2]
   rsquare <- summary(oneModel)$r.squared
   return(list(oneSlope,rsquare))
 })
-slopeFrame <- data.table(gens=unique(allRunsTable$Group.3), slopes=t(allSlopes)[,1],rsquare=t(allSlopes[,2]))
+slopeFrame <- data.table(gens=unique(allRunsTable$Group.3), slopes=unlist(t(allSlopes)[,1]),rsquare=unlist(t(allSlopes)[,2]))
 
 
 ####### plotting #####
@@ -92,14 +92,16 @@ chromSizeVsFreq <- ggplot(data=subset(allRunsTable, Group.3 != 100), aes(x=Group
   geom_point()+
   geom_line(aes(col=factor(Group.3)))+
   scale_color_manual(values = getPalette(colourCount))+
+  scale_y_log10()+
   facet_wrap(facets=~popSize)
 chromSizeVsFreq
-ggsave(filename = paste0("variedChroms",".means.2Kgens.introProp.pdf"),chromSizeVsFreq, height=10, width=15)
+ggsave(filename = paste0("variedChroms",".means.2Kgens.introProp.logScale..pdf"),chromSizeVsFreq, height=10, width=15)
 
 slopePlot <- ggplot(data=slopeFrame) +
-  geom_line(aes(x=gens, y=slopes))
+  geom_line(aes(x=gens, y=slopes))+
+  labs(y="slope", x="generation")
 slopePlot             
-ggsave(filename = paste0("hillRobertson",".slope.2Kgens.zoom.introProp.pdf"),slopePlot, height=10, width=15)
+ggsave(filename = paste0("hillRobertson",".slope.2Kgens.zoom.introProp.log.pdf"),slopePlot, height=10, width=15)
 
 ggsave(filename = paste0("hillRobertson",".slope.2Kgens.zoom.introProp.pdf"),slopePlot, height=10, width=15)
 
