@@ -6,27 +6,20 @@ inFile=sys.argv[1]
 outFile=sys.argv[2]
 repNum=int(sys.argv[3])
 
-def getBlockLengths(listOfPositions):
+def getBlockLengths(listOfIDs):
     '''get the list of block lengths, number of block lengths, and total introgressed alleles from an individual'''
-    blocks=[]
-    counter=1
+    blockDict={}
     current=""
-    for pos in listOfPositions:
-    #add something to count blocks per individual and total amount per individual
-	#output summary stats
+    for mutID in listOfIDs:
 	try:
-            if int(pos)==current+1:
-                counter+=1
-                current=int(pos)
-            elif current!="":
-                blocks.append(counter)
-                counter=1
-                current=int(pos)
-        except TypeError:
-            current=int(pos)
-    if current!="":
-        blocks.append(counter)
-    return(blocks)
+        if mutID==current:
+            blockDict[mutID]+=1
+        else:
+            current=mutID
+            blockDict[mutID]=1
+    except TypeError:
+        current=mutID
+    return([blockDict[k] for k in blockDict.keys()])
 
 def getBlockDistribution(inFile):
     blockFile=open(inFile,"r")

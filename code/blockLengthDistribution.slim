@@ -30,22 +30,29 @@ return 1.0 - (introgressed/(2*L))*s;
 
 1 late() {
 	catn(hybs);
-   allIndividuals = p1.individuals;
-	//sampledIndividuals = allIndividuals[0:hybs-1];
+	allIndividuals = p1.individuals;
 	sampledIndividuals = sample(p1.individuals, hybs);
-   sampledIndividuals.genome1.addNewMutation(m1, 0, 1:L-1);
-	}
+	for (ind in seq(0, length(sampledIndividuals)-1)){
+		sampledIndividuals[ind].genome1.addNewMutation(m1, 0, 0:(L-1),originSubpop=ind);
+	}}
 
-1: late() {
+1:100 late() {
 	allBlocks="gen\t" + sim.generation + "\t";
+	writeFile(filePath="blocks.out",contents = "gen\t" + sim.generation + "\t",append=T);
 	for (g in p1.genomes){
-	allBlocks=c(allBlocks,paste(g.mutations.position));}
-	writeFile(filePath="blocks.out",contents=allBlocks,append=T);
-	}
+		writeFile(filePath="blocks.out",contents = paste(g.mutations.subpopID),append=T);
+	};
+}
 
-100 { sim.simulationFinished(); }
+101:1000 late() {
+if (sim.generation % 10 == 0 ){
+	allBlocks="gen\t" + sim.generation + "\t";
+	writeFile(filePath="blocks.out",contents = "gen\t" + sim.generation + "\t",append=T);
+	for (g in p1.genomes){
+		writeFile(filePath="blocks.out",contents = paste(g.mutations.subpopID),append=T);
+	};
+};
+}
 
-// output samples of 10 genomes periodically, all fixed mutations at end
-//1000 late() { p1.outputSample(10); }
-//2000 late() { p1.outputSample(10); }
-//2000 late() { sim.outputFixedMutations(); }
+
+1000 { sim.simulationFinished(); }

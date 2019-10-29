@@ -13,16 +13,16 @@
 ### define constant variables ###
 BASEDIR=$PWD
 slimTemplate=$BASEDIR/code/blockLengthDistribution.slim
-workDir=$BASEDIR/blockLengthDistribution_rate1e3_allHyb
+workDir=$BASEDIR/blockLengthDistribution_rate1e3_frac1_IBDblocks
 numReps=100
 outBase=randomRecRate
 
 L=1000  #Length (number of loci.
 s=0.4
-hyb_frac=1.0 #0.4
+hyb_frac=1.0
 N=100000
 numChroms=1
-counter=1
+counter=0
 recRate=1e-3 #1e-5
 ### run code ###
 mkdir -p $workDir
@@ -30,7 +30,7 @@ mkdir -p $workDir
 cd $workDir
 
 #run SLIM for specified parameters
-startRep=3
+startRep=1
 let endRep="$startRep + $counter"
 while [ $endRep -le $numReps ]
 do
@@ -44,6 +44,14 @@ do
 done
 
 #compile results
-#run this separately, after previous code is done
+#run this separately, after previous code is done - added to the actual script, so no longer necessary for IBD block lengths.
 # cd $workDir
-# sbatch ../code/compileBlockLengths.slurm
+# startRep=1
+# counter=5
+# let endRep="$startRep + $counter"
+# while [ $endRep -le $numReps ]
+# do
+# sbatch ../code/compileBlockLengths.slurm $startRep $endRep
+# let startRep="$endRep + 1"
+# let endRep="$startRep + $counter"
+# done
