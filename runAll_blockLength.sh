@@ -45,13 +45,13 @@ done
 
 #compile results
 #run this separately, after previous code is done - added to the actual script, so no longer necessary for IBD block lengths.
-# cd $workDir
-# startRep=1
-# counter=5
-# let endRep="$startRep + $counter"
-# while [ $endRep -le $numReps ]
-# do
-# sbatch ../code/compileBlockLengths.slurm $startRep $endRep
-# let startRep="$endRep + 1"
-# let endRep="$startRep + $counter"
-# done
+cd $workDir
+startRep=1
+counter=2
+let endRep="$startRep + $counter"
+while [ $endRep -le $numReps ]
+do
+sbatch ../code/compileBlockLengths.slurm $startRep $endRep
+let startRep="$endRep + 1"
+let endRep="$startRep + $counter"
+done

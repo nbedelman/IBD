@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #SBATCH -J runSLIM
-#SBATCH -p shared,general,serial_requeue
+#SBATCH -p shared
 #SBATCH -n 1
-#SBATCH --mem=10000
-#SBATCH -t 0-02:00
+#SBATCH --mem=50000
+#SBATCH -t 1-00:00
 #SBATCH -e runSlim.err
 #SBATCH -o runSlim.out
 
@@ -20,5 +20,6 @@ for rep in $(seq $startRep $endRep)
   cd rep$rep
   /n/mallet_lab/edelman/software/SLiM_build/slim $varString $slimCode > $outFile
   tail -n $numGens $outFile > $(basename $outFile .out).percentages.tsv
+  awk -v r=$rep '{print r "\t" NR "\t" $0}' $(basename $outFile .out).percentages.tsv >> ../allRepSummary.out
   cd ..
   done

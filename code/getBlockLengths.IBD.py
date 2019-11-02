@@ -11,14 +11,14 @@ def getBlockLengths(listOfIDs):
     blockDict={}
     current=""
     for mutID in listOfIDs:
-	try:
-        if mutID==current:
-            blockDict[mutID]+=1
-        else:
+        try:
+            if mutID==current:
+                blockDict[mutID]+=1
+            else:
+                current=mutID
+                blockDict[mutID]=1
+        except TypeError:
             current=mutID
-            blockDict[mutID]=1
-    except TypeError:
-        current=mutID
     return([blockDict[k] for k in blockDict.keys()])
 
 def getBlockDistribution(inFile):

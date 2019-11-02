@@ -1,0 +1,63 @@
+// no recombination along chromosomes
+initialize() {
+	// defineConstant("K", 50);	// number of chromosomes
+	defineConstant("L", 1000); // number of loci
+	defineConstant("s", 0.4); // selective disadvantage if whole genome introgressed
+	defineConstant("N", 100000);	// population size
+	defineConstant("hyb_frac", 0.2);	// fraction of hybrids initially
+	defineConstant("r", 1/(L/K-1));	// recomb rate bw adjacent sites on same chrom
+	defineConstant("hybs", asInteger(round(hyb_frac*N)));
+	initializeMutationRate(0);
+   initializeMutationType("m1", 0.5, "f", 0);
+   m1.convertToSubstitution = F;
+   initializeGenomicElementType("g1", m1, 1.0);
+	initializeGenomicElement(g1, 0, L-1);
+	ends = NULL;
+	rates = NULL;
+	for (chroms in 2:K-1)
+	{
+	catn(chroms);
+	chromend = asInteger(round(chroms*L/K))-1;
+	chromstart = asInteger(round(chroms*L/K));
+	ends = c(ends, chromend, chromstart);
+	rates = c(rates, r, 0.5);
+	}
+	ends = c(ends, L-1);
+	rates = c(rates,r);
+	catn(rates);
+	catn(ends);
+	initializeRecombinationRate(rates, ends);
+	//initializeRecombinationRate(0);
+	initializeSex("A");
+}
+
+1 {
+	sim.addSubpop("p1", N);
+}
+
+fitness(NULL) {
+ introgressed = sum(c(genome1,genome2).countOfMutationsOfType(m1));
+return 1.0 - (introgressed/(2*L))*s;
+}
+
+1 late() {
+	catn(hybs);
+   allIndividuals = p1.individuals;
+	//sampledIndividuals = allIndividuals[0:hybs-1];
+	sampledIndividuals = sample(p1.individuals, hybs);
+   sampledIndividuals.genome1.addNewMutation(m1, 0, 1:L-1);
+	}
+
+1: late() {
+   inds = p1.individuals;
+   inds_introgressed = inds.countOfMutationsOfType(m1);
+   catn(mean(inds_introgressed)/(2*L));
+   }
+
+
+200 { sim.simulationFinished(); }
+
+// output samples of 10 genomes periodically, all fixed mutations at end
+//1000 late() { p1.outputSample(10); }
+//2000 late() { p1.outputSample(10); }
+//2000 late() { sim.outputFixedMutations(); }

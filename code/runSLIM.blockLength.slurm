@@ -3,7 +3,7 @@
 #SBATCH -J runSLIM
 #SBATCH -p shared
 #SBATCH -n 1
-#SBATCH --mem=10000
+#SBATCH --mem=50000
 #SBATCH -t 3-00:00
 #SBATCH -e runSlim.err
 #SBATCH -o runSlim.out
