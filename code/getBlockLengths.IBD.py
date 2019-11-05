@@ -24,16 +24,22 @@ def getBlockLengths(listOfIDs):
 def getBlockDistribution(inFile):
     blockFile=open(inFile,"r")
     blockDict={}
+    chromNum=1
     for line in blockFile:
         try:
             if "gen" in line:
                 gen=int(line.split()[1])
                 blockDict[gen]=[[],[],[]] #for each generation, we'll have a list of all block lengths, a list of number of blocks in each individual, and a list of number of introgressed alleles in each individual.
+            elif chromNum==1:
+                individual=line.split()
+                chromNum=2
             else:
-                individualResult=getBlockLengths(line.split())
+                individual+=line.split()
+                individualResult=getBlockLengths(individual)
                 blockDict[gen][0]+=individualResult
                 blockDict[gen][1].append(len(individualResult))
                 blockDict[gen][2].append(sum(individualResult))
+                chromNum=1
         except IndexError:
             pass
     blockFile.close()
