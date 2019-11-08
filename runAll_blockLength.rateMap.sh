@@ -12,7 +12,7 @@
 ######## SEX DIFFERENCE #########
 ### define constant variables ###
 BASEDIR=$PWD
-slimTemplate=$BASEDIR/code/blockLengthDistribution.slim
+slimTemplate=$BASEDIR/code/blockLengthDistribution.rateMap.slim
 workDir=$BASEDIR/blockLengthDistribution_rate1e3_frac1_fly_IBDblocks
 numReps=100
 outBase=randomRecRate
@@ -36,7 +36,7 @@ let endRep="$startRep + $counter"
 while [ $endRep -le $numReps ]
 do
     varString=$(echo "-d" L=$L "-d" s=$s "-d" hyb_frac=$hyb_frac \
-     "-d" N=$N "-d" numChroms=$numChroms "-d" recRate=$recRate)
+     "-d" N=$N "-d" numChroms=$numChroms "-d" MR=$maleRate "-d" FR=$femaleRate)
       echo $varString
       echo $startRep $endRep $counter
       sbatch $BASEDIR/code/runSLIM.blockLength.slurm $slimTemplate "$varString" $startRep $endRep
