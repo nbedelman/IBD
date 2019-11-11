@@ -12,7 +12,7 @@
 ######## SEX DIFFERENCE #########
 ### define constant variables ###
 BASEDIR=$PWD
-slimTemplate=$BASEDIR/code/blockLengthDistribution.slim
+slimTemplate=$BASEDIR/code/blockLengthDistribution.rateMap.slim
 workDir=$BASEDIR/blockLengthDistribution_rate1e3_frac1_fly_IBDblocks
 numReps=100
 outBase=randomRecRate
