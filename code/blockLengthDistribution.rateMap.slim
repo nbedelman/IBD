@@ -55,20 +55,24 @@ return 1.0 - (introgressed/(2*L))*s;
 	}}
 
 1:100 late() {
-	allBlocks="gen\t" + sim.generation + "\t";
 	writeFile(filePath="blocks.out",contents = "gen\t" + sim.generation + "\t",append=T);
+	catn("gen\t" + sim.generation + "\t");
 	for (g in p1.genomes){
-		writeFile(filePath="blocks.out",contents = paste(g.mutations.subpopID),append=T);
-	};
+thisInd=c();
+for (u in unique(g.mutations.subpopID))
+ {thisInd=c(thisInd, (length(which(g.mutations.subpopID==u))));}
+	writeFile(filePath="blocks.out",contents = paste(thisInd),append=T);}
 }
 
 101:1000 late() {
 if (sim.generation % 10 == 0 ){
-	allBlocks="gen\t" + sim.generation + "\t";
 	writeFile(filePath="blocks.out",contents = "gen\t" + sim.generation + "\t",append=T);
+	catn("gen\t" + sim.generation + "\t");
 	for (g in p1.genomes){
-		writeFile(filePath="blocks.out",contents = paste(g.mutations.subpopID),append=T);
-	};
+thisInd=c();
+for (u in unique(g.mutations.subpopID))
+ {thisInd=c(thisInd, (length(which(g.mutations.subpopID==u))));}
+	writeFile(filePath="blocks.out",contents = paste(thisInd),append=T);};
 };
 }
 
