@@ -17,7 +17,7 @@ for rep in $(seq $startRep $endRep)
   do mkdir rep$rep
   cd rep$rep
   /n/mallet_lab/edelman/software/SLiM_build/slim $varString $slimCode
-  /n/scratchlfs/mallet_lab/edelman/IBD/code/getBlockLengths.IBD.py blocks.out IBDBlockLengths.tsv $rep
+  /n/scratchlfs/mallet_lab/edelman/IBD/code/getBlockLengths.IBD.lengthsOnly.py blocks.out IBDBlockLengths.tsv $rep
   cat IBDBlockLengths.tsv >> ../allIBDBlockLengths.tsv
   cd ..
   done
